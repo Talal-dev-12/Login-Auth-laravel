@@ -7,6 +7,9 @@ use App\Http\Controllers\AuthController;
 // Show login form
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 
+Route::get('/', function () {
+    return view('testing');
+});
 // Handle login form submission
 Route::post('/login', [AuthController::class, 'login'])->name('check');
 
