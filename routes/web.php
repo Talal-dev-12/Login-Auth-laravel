@@ -26,10 +26,10 @@ Route::get('/register', function () {
 Route::post('/register', [AuthController::class, 'register'])->name('registration');
 
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
-Route::post('/forgot-password', [AuthController::class, 'sendOTP']);
+Route::post('/forgot-password', [AuthController::class, 'sendOTP'])->name('OtpSend');
 
 Route::get('/verify-otp', [AuthController::class, 'showOTPForm'])->name('verify.otp.form');
-Route::post('/verify-otp', [AuthController::class, 'verifyOTP']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('CheckOtp');
 
 Route::get('/reset-password', [AuthController::class, 'showResetForm'])->name('reset.password.form');
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);

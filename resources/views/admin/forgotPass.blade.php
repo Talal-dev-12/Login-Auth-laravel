@@ -13,7 +13,7 @@
         <form method="POST" action="#">
             @csrf
             <!-- resources/views/auth/forgot-password.blade.php -->
-            <form action="#" method="POST">
+            <form action="{{route('OtpSend')}}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label class="block mb-1 text-gray-600">Email</label>

@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
-
-
 class AuthController extends Controller
 {
     public function showLoginForm()
@@ -31,7 +29,7 @@ class AuthController extends Controller
 
         return back()->withErrors([
             'email' => 'Invalid credentials.',
-        ]);
+        ])->withInput();
     }
 
     public function logout(Request $request)
@@ -42,7 +40,25 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-    public function register() {}
+    public function register(Request $request)
+    {
+        // Validate input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        // Create user
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // Password encrypted
+        ]);
+
+        return redirect('/login')->with('success', 'Registration successful! Please login.');
+    }
+
 
     public function showForgotForm()
     {
@@ -71,15 +87,35 @@ class AuthController extends Controller
 
         return redirect()->route('verify.otp.form')->with('email', $user->email);
     }
-    public function verifyOTP(Request $request)
+    public function showOTPForm()
     {
-        $user = User::where('email', $request->email)->where('otp', $request->otp)->first();
+        return view('admin.verifyOtp');
+    }
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return back()->withErrors(['otp' => 'Invalid OTP']);
+            return back()->withErrors(['email' => 'Invalid email']);
         }
 
-        return redirect()->route('reset.password.form')->with('email', $user->email);
+        $otpData = UserOtp::where('user_id', $user->id)
+            ->where('otp', $request->otp)
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if (!$otpData) {
+            return back()->withErrors(['otp' => 'Invalid or expired OTP'])->withInput();
+        }
+
+        // OTP valid → Do something, e.g., allow password reset
+        return view('auth.reset-password', ['email' => $user->email]);
     }
     public function resetPassword(Request $request)
     {

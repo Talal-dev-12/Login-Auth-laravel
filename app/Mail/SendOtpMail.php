@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -13,11 +12,11 @@ class SendOtpMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $otp;
+
     /**
      * Create a new message instance.
      */
-    public $otp;
-    public $message;
     public function __construct($otp)
     {
         $this->otp = $otp;
@@ -29,28 +28,25 @@ class SendOtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Send Otp Mail',
+            subject: 'Your OTP Code - Email Verification'
         );
     }
-    public function build()
-    {
-        return $this->subject('Your OTP Code')
-            ->view('emails.otp'); // this should be your blade file
-    }
+
     /**
      * Get the message content definition.
      */
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'admin.OtpMessage',
+            with: [
+                'otp' => $this->otp
+            ]
         );
     }
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
     public function attachments(): array
     {
