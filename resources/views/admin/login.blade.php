@@ -24,15 +24,19 @@
                 @error('email')
                     <div class="flex justify-between items-center">
                         <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                        <a href="#">
-                            <span class="text-blue-500 text-sm mt-1 hover:ul-blue-500">Forgot password?</span>
+                        <a href="{{route('forgot.password')}}">
+                            <span class="text-blue-500 text-sm hover:underline">Forgot password?</span>
                         </a>
                     </div>
                 @enderror
             </div>
             <button type="submit"
-                class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">Login</button>
+                class="w-full bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 transition">Login</button>
         </form>
+        <p class="text-center text-sm text-gray-600 mt-4">
+            Don't have an account?
+            <a href="/register" class="text-blue-600 hover:underline">Register here</a>
+        </p>
     </div>
 </body>
 

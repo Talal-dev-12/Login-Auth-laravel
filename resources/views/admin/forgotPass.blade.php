@@ -13,10 +13,16 @@
         <form method="POST" action="#">
             @csrf
             <!-- resources/views/auth/forgot-password.blade.php -->
-            <form action="{{ route('forgot.password') }}" method="POST">
+            <form action="#" method="POST">
                 @csrf
-                <input type="email" name="email" placeholder="Enter your email" required>
-                <button type="submit">Send OTP</button>
+                <div class="mb-4">
+                    <label class="block mb-1 text-gray-600">Email</label>
+                    <input type="email" name="email" required
+                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 transition">Send
+                    Otp</button>
             </form>
     </div>
 </body>

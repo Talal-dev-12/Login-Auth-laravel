@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserOtp;
+use App\Mail\SendOtpMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+
 
 
 class AuthController extends Controller
@@ -39,6 +43,11 @@ class AuthController extends Controller
     }
 
     public function register() {}
+
+    public function showForgotForm()
+    {
+        return view('admin.forgotPass');
+    }
     public function sendOTP(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -49,10 +58,16 @@ class AuthController extends Controller
         }
 
         $otp = rand(100000, 999999);
-        $user->update(['otp' => $otp]); // You must add 'otp' column to your users table
-
+        // Store OTP
+        UserOtp::create([
+            'user_id' => $user->id,
+            'otp' => $otp,
+            'expires_at' => Carbon::now()->addMinutes(10)
+        ]);
+        $message = 'Your Otp is :';
         // Send email
         Mail::to($user->email)->send(new SendOtpMail($otp));
+
 
         return redirect()->route('verify.otp.form')->with('email', $user->email);
     }
