@@ -5,13 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
 // Show login form
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 
-Route::get('/', function () {
-    return view('testing');
-});
 // Handle login form submission
-Route::post('/login', [AuthController::class, 'login'])->name('check');
+Route::post('/', [AuthController::class, 'login'])->name('check');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -28,8 +25,8 @@ Route::post('/register', [AuthController::class, 'register'])->name('registratio
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.password');
 Route::post('/forgot-password', [AuthController::class, 'sendOTP'])->name('OtpSend');
 
-Route::get('/verify-otp', [AuthController::class, 'showOTPForm'])->name('verify.otp.form');
-Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('CheckOtp');
+Route::get('/verify-otp', [AuthController::class, 'showOTPForm'])->name('verify.otp.form')->middleware('otp.verified');
+Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('CheckOtp')->middleware('otp.verified');
 
-Route::get('/reset-password', [AuthController::class, 'showResetForm'])->name('reset.password.form');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
+Route::get('/reset-password', [AuthController::class, 'showResetForm'])->name('reset.password.form')->middleware('otp.verified');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword')->middleware('otp.verified');

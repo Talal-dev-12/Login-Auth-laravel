@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserOtp;
 use App\Mail\SendOtpMail;
 use Illuminate\Http\Request;
+use App\Jobs\SendOtpEmailJob;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,17 +28,17 @@ class AuthController extends Controller
             return redirect('/dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials.',
+        return back()->with([
+            'error' => 'Invalid credentials.',
+            'email' => $request->email
         ])->withInput();
     }
-
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect('/');
     }
 
     public function register(Request $request)
@@ -56,7 +57,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password), // Password encrypted
         ]);
 
-        return redirect('/login')->with('success', 'Registration successful! Please login.');
+        return redirect('/')->with('success', 'Registration successful! Please login.');
     }
 
 
@@ -82,10 +83,20 @@ class AuthController extends Controller
         ]);
         $message = 'Your Otp is :';
         // Send email
-        Mail::to($user->email)->send(new SendOtpMail($otp));
+        // Mail::to($user->email)->send(new SendOtpMail($otp));
+        // Instead of: Mail::to($email)->send(new SendOtpMail($otp));
+        SendOtpEmailJob::dispatch($user->email, $otp);
 
 
-        return redirect()->route('verify.otp.form')->with('email', $user->email);
+        // Instead of: Mail::to($email)->send(new SendOtpMail($otp));
+
+
+
+
+        return redirect()->route('verify.otp.form')->with([
+            'email' => $user->email,
+            'otp_verified' => true
+        ]);
     }
     public function showOTPForm()
     {
@@ -100,7 +111,7 @@ class AuthController extends Controller
         $email = $request->email;
 
         if (!$email) {
-            return redirect('/login')->withErrors(['email' => 'Session expired. Please try again.']);
+            return redirect('/')->withErrors(['email' => 'Session expired. Please try again.']);
         }
 
         $user = User::where('email', $email)->first();
@@ -120,7 +131,10 @@ class AuthController extends Controller
         }
 
         // OTP verified: allow next step
-        return view('admin.resetPassword', ['email' => $user->email]);
+        return view('admin.resetPassword', [
+            'email' => $user->email,
+            'otp_verified' => true
+        ]);
     }
 
     // public function showResetForm()
@@ -138,6 +152,6 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect('/login')->with('success', 'Password has been reset.');
+        return redirect('/')->with('success', 'Password has been reset.');
     }
 }

@@ -8,6 +8,12 @@
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    @if(session('middleWare'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
+            class="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+            {{ session('middleWare') }}
+        </div>
+    @endif
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 class="text-2xl font-semibold mb-6 text-center">Login to your account</h2>
         <form method="POST" action="{{ route('check') }}">
@@ -21,14 +27,14 @@
                 <label class="block mb-1 text-gray-600">Password</label>
                 <input type="password" name="password" required
                     class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                @error('email')
+                @if (session('error'))
                     <div class="flex justify-between items-center">
-                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                        <span class="text-red-500 text-sm mt-1">{{ session('error') }}</span>
                         <a href="{{route('forgot.password')}}">
                             <span class="text-blue-500 text-sm hover:underline">Forgot password?</span>
                         </a>
                     </div>
-                @enderror
+                @endif
             </div>
             @if(session('success'))
                 <div class="mb-4">
