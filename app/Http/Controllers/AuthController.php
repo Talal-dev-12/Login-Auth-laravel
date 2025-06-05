@@ -94,11 +94,16 @@ class AuthController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
             'otp' => 'required'
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $email = $request->email;
+
+        if (!$email) {
+            return redirect('/login')->withErrors(['email' => 'Session expired. Please try again.']);
+        }
+
+        $user = User::where('email', $email)->first();
 
         if (!$user) {
             return back()->withErrors(['email' => 'Invalid email']);
@@ -114,9 +119,14 @@ class AuthController extends Controller
             return back()->withErrors(['otp' => 'Invalid or expired OTP'])->withInput();
         }
 
-        // OTP valid → Do something, e.g., allow password reset
-        return view('auth.reset-password', ['email' => $user->email]);
+        // OTP verified: allow next step
+        return view('admin.resetPassword', ['email' => $user->email]);
     }
+
+    // public function showResetForm()
+    // {
+    //     return view('admin.resetPassword');
+    // }
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -126,7 +136,6 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         $user->update([
             'password' => Hash::make($request->password),
-            'otp' => null // Clear OTP after success
         ]);
 
         return redirect('/login')->with('success', 'Password has been reset.');

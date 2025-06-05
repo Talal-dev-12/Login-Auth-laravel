@@ -1,8 +1,3 @@
-@if (!session('email'))
-    <script>window.location.href = "{{ url('/login') }}";</script>
-    @php exit; @endphp
-@endif
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,10 +20,10 @@
                 {{ session('otp') }}
             </div>
         @endif
-
         <form action="{{ route('CheckOtp') }}" method="POST">
             @csrf
             <div class="mb-4">
+                <input type="hidden" name="email" value="{{session('email')}}">
                 <input type="text" name="otp" placeholder="Enter OTP"
                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                     required>

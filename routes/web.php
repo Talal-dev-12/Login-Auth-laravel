@@ -32,4 +32,4 @@ Route::get('/verify-otp', [AuthController::class, 'showOTPForm'])->name('verify.
 Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('CheckOtp');
 
 Route::get('/reset-password', [AuthController::class, 'showResetForm'])->name('reset.password.form');
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('resetPassword');
